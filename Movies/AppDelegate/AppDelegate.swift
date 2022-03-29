@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = UIStoryboard(name: "Movies", bundle: nil).instantiateInitialViewController()
+        window?.rootViewController = UIStoryboard(name: "Splash", bundle: nil).instantiateInitialViewController()
         window?.makeKeyAndVisible()
         
         return true
