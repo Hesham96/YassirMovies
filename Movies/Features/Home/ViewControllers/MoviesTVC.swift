@@ -10,8 +10,6 @@ import UIKit
 
 class MoviesTVC: UITableViewController {
 
-    
-
     private var service:NetworkService?
     private let router = Router()
 
@@ -35,7 +33,6 @@ class MoviesTVC: UITableViewController {
     }
     
     @objc private func refreshData(_ sender: Any) {
-        // Fetch Weather Data
         currentPage = 0
         getMoviesData()
     }
@@ -80,9 +77,7 @@ extension MoviesTVC{
         service?.get(request: request, completion: { result in
             switch result {
             case .failure(let error):
-                let alert = UIAlertController(title: "Alert", message: error.localizedDescription, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                self.showError(with: error)
             case .success(let data):
                 let response: MoviesResponse = try! JSONDecoder().decode(MoviesResponse.self, from: data)
                 self.totalPages = response.totalPages ?? 0
@@ -90,6 +85,12 @@ extension MoviesTVC{
                 completion?()
             }
         })
+    }
+    
+    func showError(with error:Error){
+        let alert = UIAlertController(title: "Alert", message: error.localizedDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
 }
