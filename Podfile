@@ -7,9 +7,6 @@ target 'Movies' do
 
   # Pods for Movies
 
-  #Networking
-  pod 'Alamofire'
-  
   #Images
   pod 'Kingfisher', '~> 4.10.1'
   
