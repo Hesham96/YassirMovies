@@ -43,9 +43,12 @@ class MoviesTVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        router.navigateToHeroDetailsVC(from: <#T##ViewControllerType#>, data: <#T##Movie#>)
+        router.navigateToMovieDetailsVC(from: self, data: movies?[indexPath.row])
     }
 
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
 }
 
 

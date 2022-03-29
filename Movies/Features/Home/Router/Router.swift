@@ -21,12 +21,12 @@ final class Router {
         }
     }
     
-    func navigateToMovieDetailsVC(from view: ViewControllerType, data: Movie) {
-//        let vc = Router.moviesStoryboard.instantiateViewController(withIdentifier: "HeroDetailsVC") as? HeroDetailsVC
-//        vc?.viewModel.characterDetailsData.accept(data)
-//        if let viewController = view as? UIViewController {
-//            viewController.present(vc!, animated: true, completion: nil)
-//        }
+    func navigateToMovieDetailsVC(from view: ViewControllerType, data: Movie?) {
+        let vc = Router.moviesStoryboard.instantiateViewController(withIdentifier: "MovieDetailsTVC") as? MovieDetailsTVC
+        vc?.movie = data
+        if let viewController = view as? UIViewController {
+            viewController.present(vc!, animated: true, completion: nil)
+        }
     }
     
 }
