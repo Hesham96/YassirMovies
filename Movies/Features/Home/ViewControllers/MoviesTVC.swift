@@ -13,17 +13,15 @@ class MoviesTVC: UITableViewController {
     private var service:NetworkService?
     private let router = Router()
 
-    private var movies:[Movie]?
+    private var currentPage : Int = 0
+    private var totalPages : Int = 1
+
+    private var movies:[Movie] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-        getQuizData(){
-            DispatchQueue.main.async {
-                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-                self.tableView.reloadData()
-            }
-        }
+        getMoviesData()
     }
 
     func setup(){
@@ -32,18 +30,27 @@ class MoviesTVC: UITableViewController {
         tableView.registerCellNib(MovieCell.self)
     }
     
+    func getMoviesData(){
+        fetchMoviesApi(){
+            DispatchQueue.main.async {
+                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
-        cell.config((movies?[indexPath.row])!)
+        cell.config((movies[indexPath.row]))
         return cell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return movies?.count ?? 0
+        return movies.count
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        router.navigateToMovieDetailsVC(from: self, data: movies?[indexPath.row])
+        router.navigateToMovieDetailsVC(from: self, data: movies[indexPath.row])
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -51,23 +58,41 @@ class MoviesTVC: UITableViewController {
     }
 }
 
-
+//MARK: Fetch Api
 extension MoviesTVC{
     
-    func getQuizData(_ completion: (() -> Void)? = nil){
+    func fetchMoviesApi(_ completion: (() -> Void)? = nil){
         let request = FetchMoviesRequest()
+        currentPage += 1
+        request.page = currentPage
         MBProgressHUD.showAdded(to: self.view, animated: true)
         service?.get(request: request, completion: { result in
             switch result {
             case .failure(let error):
-                print("error -->",error)
-                //TODO Add alert
+                let alert = UIAlertController(title: "Alert", message: error.localizedDescription, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             case .success(let data):
                 let response: MoviesResponse = try! JSONDecoder().decode(MoviesResponse.self, from: data)
-                self.movies = response.movies
+                self.totalPages = response.totalPages ?? 0
+                self.movies.append(contentsOf: response.movies ?? [])
                 completion?()
             }
         })
     }
     
+}
+
+//MARK: Pagination
+extension MoviesTVC{
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let lastItem = self.movies.count - 1
+            if indexPath.row == lastItem {
+                if currentPage < totalPages {
+                    getMoviesData()
+                }
+            }
+    }
+
 }
