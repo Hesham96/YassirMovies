@@ -10,6 +10,8 @@ import UIKit
 
 class MoviesTVC: UITableViewController {
 
+    
+
     private var service:NetworkService?
     private let router = Router()
 
@@ -26,13 +28,22 @@ class MoviesTVC: UITableViewController {
 
     func setup(){
         service = NetworkService()
+        refreshControl = UIRefreshControl()
+        refreshControl?.addTarget(self, action: #selector(refreshData(_:)), for: .valueChanged)
         tableView.config()
         tableView.registerCellNib(MovieCell.self)
+    }
+    
+    @objc private func refreshData(_ sender: Any) {
+        // Fetch Weather Data
+        currentPage = 0
+        getMoviesData()
     }
     
     func getMoviesData(){
         fetchMoviesApi(){
             DispatchQueue.main.async {
+                self.refreshControl?.endRefreshing()
                 MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
                 self.tableView.reloadData()
             }
